@@ -1,2 +1,1 @@
-# nlog.loki
-NLog Loki Target
+# NLog Loki Target
