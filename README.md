@@ -1,8 +1,24 @@
 # NLog Loki Target
 
+![CI](https://github.com/anton-gogolev/nlog.loki/workflows/CI/badge.svg?branch=master)
+
 This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki](https://grafana.com/oss/loki/).
 
-## Using NLog.Loki.LokiTarget
+> Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation system inspired by Prometheus. It is designed to be very cost effective and easy to operate.
+
+## Installation
+
+The NLog.Loki NuGet package can be found [here](https://www.nuget.org/packages/NLog.Loki). You can install it via one of the following commands below:
+
+NuGet command:
+
+    Install-Package NLog.Loki
+
+.NET Core CLI command:
+
+    dotnet add package NLog.Loki
+
+## Usage
 
 Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `NLog.Loki` as an extension assembly with NLog:
 
