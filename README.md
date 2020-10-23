@@ -8,7 +8,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <extensions>
     <add assembly="NLog.Loki" />
@@ -21,7 +21,7 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <target name="loki" xsi:type="loki" endpoint="%LOKI_ENDPOINT_URI%">
     <label name="level" layout="${level:lowercase=true}" />
@@ -35,6 +35,6 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 </nlog>
 ```
 
-The `@endpoint` attribute must contain a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor). [Environment variables](https://12factor.net/config) are supported.
+The `@endpoint` attribute must contain a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor). [Environment variables](https://12factor.net/config) are supported. When an invalid URI is encountered, all log messages are silently discarded.
 
 `label` elements can be used to enrich messages with additional [labels](https://grafana.com/docs/loki/latest/design-documents/labels/). `label/@layout` support usual NLog layout renderers.
