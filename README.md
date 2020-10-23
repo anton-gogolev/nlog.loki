@@ -9,9 +9,11 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
   <extensions>
     <add assembly="NLog.Loki" />
   </extensions>
+
 </nlog>
 ```
 
@@ -20,6 +22,7 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
   <target name="loki" xsi:type="loki" endpoint="%LOKI_ENDPOINT_URI%">
     <label name="level" layout="${level:lowercase=true}" />
     <label name="server" layout="${hostname:lowercase=true}" />
@@ -28,6 +31,7 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
   <rules>
     <logger name="*" minlevel="Info" writeTo="loki" />
   </rules>
+
 </nlog>
 ```
 
