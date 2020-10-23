@@ -30,6 +30,7 @@ namespace NLog.Loki.Tests
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
         }
+
         [Test]
         public void Write()
         {
