@@ -30,3 +30,4 @@ jobs:
         PROJECT_FILE_PATH: ./src/NLog.Loki/NLog.Loki.csproj
         VERSION_FILE_PATH: ./.semver
         VERSION_REGEX: ^(.*)$
+        NUGET_KEY: ${{secrets.NUGET_KEY}}
