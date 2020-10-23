@@ -12,7 +12,12 @@ namespace NLog.Loki
 
         public Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
         {
+#if NETSTANDARD
             return Task.CompletedTask;
+#else
+            return Task.FromResult(0);
+#endif
+
         }
     }
 }
