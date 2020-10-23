@@ -8,11 +8,16 @@ namespace NLog.Loki.Model
     {
         private readonly int hashCode;
 
-        public IReadOnlyCollection<LokiLabel> Labels { get; }
+        public ISet<LokiLabel> Labels { get; }
+
+        public LokiLabels(params LokiLabel[] labels) :
+            this((IEnumerable<LokiLabel>)labels)
+        {
+        }
 
         public LokiLabels(IEnumerable<LokiLabel> labels)
         {
-            Labels = new List<LokiLabel>(labels ?? Enumerable.Empty<LokiLabel>());
+            Labels = new HashSet<LokiLabel>(labels ?? Enumerable.Empty<LokiLabel>());
 
             unchecked
             {
@@ -26,15 +31,15 @@ namespace NLog.Loki.Model
         {
             if(ReferenceEquals(null, other)) return false;
             if(ReferenceEquals(this, other)) return true;
-            return Labels.SequenceEqual(other.Labels);
+            return Labels.SetEquals(other.Labels);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            if(ReferenceEquals(null, obj)) return false;
-            if(ReferenceEquals(this, obj)) return true;
-            if(obj.GetType() != this.GetType()) return false;
-            return Equals((LokiLabels)obj);
+            if(ReferenceEquals(null, other)) return false;
+            if(ReferenceEquals(this, other)) return true;
+            if(other.GetType() != this.GetType()) return false;
+            return Equals((LokiLabels)other);
         }
 
         public override int GetHashCode()

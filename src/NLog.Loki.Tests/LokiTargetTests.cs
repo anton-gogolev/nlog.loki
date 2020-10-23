@@ -90,6 +90,15 @@ namespace NLog.Loki.Tests
                 using(MappedDiagnosticsLogicalContext.SetScoped("cfg", "v1"))
                     log.Error($"hello again {n * 4}");
 
+                try
+                {
+                    throw new InvalidOperationException();
+                }
+                catch(Exception e)
+                {
+                    log.Error(e);
+                }
+
             }
 
             LogManager.Shutdown();

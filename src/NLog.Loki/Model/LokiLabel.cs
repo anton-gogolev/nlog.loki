@@ -21,12 +21,12 @@ namespace NLog.Loki.Model
             return Label == other.Label && Value == other.Value;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            if(ReferenceEquals(null, obj)) return false;
-            if(ReferenceEquals(this, obj)) return true;
-            if(obj.GetType() != this.GetType()) return false;
-            return Equals((LokiLabel)obj);
+            if(ReferenceEquals(null, other)) return false;
+            if(ReferenceEquals(this, other)) return true;
+            if(other.GetType() != this.GetType()) return false;
+            return Equals((LokiLabel)other);
         }
 
         public override int GetHashCode()

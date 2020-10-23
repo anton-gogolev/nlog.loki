@@ -43,12 +43,14 @@ namespace NLog.Loki
         protected override Task WriteAsyncTask(LogEventInfo logEvent, CancellationToken cancellationToken)
         {
             var @event = GetLokiEvent(logEvent);
+
             return lazyLokiTransport.Value.WriteLogEventsAsync(new[] { @event });
         }
 
         protected override Task WriteAsyncTask(IList<LogEventInfo> logEvents, CancellationToken cancellationToken)
         {
             var events = GetLokiEvents(logEvents);
+
             return lazyLokiTransport.Value.WriteLogEventsAsync(events);
         }
 
@@ -87,7 +89,10 @@ namespace NLog.Loki
             }
 
             InternalLogger.Warn("Unable to create a valid Loki Endpoint URI from '{0}'", endpoint);
-            return new NullLokiTransport();
+
+            var nullLokiTransport = new NullLokiTransport();
+
+            return nullLokiTransport;
         }
 
         internal static ILokiHttpClient GetLokiHttpClient(Uri uri)
