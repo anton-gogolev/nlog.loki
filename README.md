@@ -29,4 +29,8 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 </nlog>
 ```
 
-The `@endpoint` attribute must contain a fully-qualified absolute URL of the Loki server. Environment variables are fully supported. `label` elements can be used to enrich messages with additional labels. `label/@layout` support usual NLog layout renderers.
+The `@endpoint` attribute must contain a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor).
+
+[Environment variables](https://12factor.net/config) are fully supported.
+
+`label` elements can be used to enrich messages with additional [labels](https://grafana.com/docs/loki/latest/design-documents/labels/). `label/@layout` support usual NLog layout renderers.
