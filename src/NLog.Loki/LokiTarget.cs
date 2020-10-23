@@ -80,7 +80,9 @@ namespace NLog.Loki
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                 {
                     var lokiHttpClient = LokiHttpClientFactory(uri);
-                    return new HttpLokiTransport(uri, lokiHttpClient);
+                    var httpLokiTransport = new HttpLokiTransport(uri, lokiHttpClient);
+
+                    return httpLokiTransport;
                 }
             }
 
