@@ -1,4 +1,4 @@
-name: .NET Core
+name: Build & Test NLog.Loki
 
 on:
   push:
@@ -20,6 +20,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build .\src\NLog.Loki.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test .\src\NLog.Loki.sln --no-restore --verbosity normal
