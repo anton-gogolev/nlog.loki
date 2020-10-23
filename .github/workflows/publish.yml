@@ -28,3 +28,5 @@ jobs:
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: ./src/NLog.Loki/NLog.Loki.csproj
+        VERSION_FILE_PATH: ./.semver
+        VERSION_REGEX: ^(.*)$
