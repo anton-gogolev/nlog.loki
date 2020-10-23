@@ -43,7 +43,7 @@ namespace NLog.Loki.Tests.Impl
             }
 
             Assert.AreEqual(
-                @"{""hello"":""\r\n\t\""\r\"" hello\/utf8\\=\u2713\ud834\udd1e\ud83d\ude02\ud835\udd05"",""answer"":42,""long_answer"":4.242424E+07,""precise_answer"":12234.543,""null_answer"":null,""nested"":{""x"":1}}",
+                @"{""hello"":""\r\n\t\""\r\"" hello\/utf8\\=\u2713\ud834\udd1e\ud83d\ude02\ud835\udd05"",""answer"":42,""long_answer"":42424240,""precise_answer"":12234.543,""null_answer"":null,""nested"":{""x"":1}}",
                 stringBuilder.ToString());
         }
     }
