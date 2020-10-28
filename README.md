@@ -39,7 +39,7 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <target name="loki" xsi:type="loki" endpoint="%LOKI_ENDPOINT_URI%">
+  <target name="loki" xsi:type="loki" endpoint="${environment:LOKI_ENDPOINT_URI}">
     <label name="level" layout="${level:lowercase=true}" />
     <label name="server" layout="${hostname:lowercase=true}" />
   </target>
