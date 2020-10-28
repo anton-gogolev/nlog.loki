@@ -51,6 +51,6 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 </nlog>
 ```
 
-The `@endpoint` attribute is a [Layout](https://github.com/NLog/NLog/wiki/Layouts) that must ultimately resolve to a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor). [Environment variables](https://12factor.net/config) are supported. When an invalid URI is encountered, all log messages are silently discarded.
+The `@endpoint` attribute is a [Layout](https://github.com/NLog/NLog/wiki/Layouts) that must ultimately resolve to a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor). When an invalid URI is encountered, all log messages are silently discarded.
 
 `label` elements can be used to enrich messages with additional [labels](https://grafana.com/docs/loki/latest/design-documents/labels/). `label/@layout` support usual NLog layout renderers.
