@@ -26,6 +26,7 @@ namespace NLog.Loki.Tests
             {
                 var result = await httpContent.ReadAsStringAsync();
                 stringBuilder.Append(result);
+                stringBuilder.AppendLine();
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -107,16 +108,17 @@ namespace NLog.Loki.Tests
         }
 
         [Test]
-        [TestCase("%SCHEME%://%HOST%:3100/", ExpectedResult = typeof(HttpLokiTransport))]
-        [TestCase("udp://%HOST%:3100/", ExpectedResult = typeof(NullLokiTransport))]
+        [TestCase("${environment:SCHEME}://${environment:HOST}:3100/", ExpectedResult = typeof(HttpLokiTransport))]
+        [TestCase("udp://${environment:HOST}:3100/", ExpectedResult = typeof(NullLokiTransport))]
         [TestCase("", ExpectedResult = typeof(NullLokiTransport))]
         [TestCase(null, ExpectedResult = typeof(NullLokiTransport))]
-        public Type GetLokiTransport(string endpoint)
+        public Type GetLokiTransport(string endpointLayout)
         {
             Environment.SetEnvironmentVariable("SCHEME", "https");
             Environment.SetEnvironmentVariable("HOST", "loki.lvh.me");
 
-            var lokiTargetTransport = LokiTarget.GetLokiTransport(endpoint);
+            var endpoint = Layout.FromString(endpointLayout);
+            var lokiTargetTransport = new LokiTarget().GetLokiTransport(endpoint);
 
             return lokiTargetTransport.GetType();
         }

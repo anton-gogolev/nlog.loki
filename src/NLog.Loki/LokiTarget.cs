@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NLog.Common;
 using NLog.Config;
+using NLog.Layouts;
 using NLog.Loki.Model;
 using NLog.Targets;
 
@@ -17,7 +18,7 @@ namespace NLog.Loki
         private readonly Lazy<ILokiTransport> lazyLokiTransport;
 
         [RequiredParameter]
-        public string Endpoint { get; set; }
+        public Layout Endpoint { get; set; }
 
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
@@ -73,11 +74,10 @@ namespace NLog.Loki
             return @event;
         }
 
-        internal static ILokiTransport GetLokiTransport(string endpoint)
+        internal ILokiTransport GetLokiTransport(Layout endpoint)
         {
-            endpoint = Environment.ExpandEnvironmentVariables(endpoint ?? "");
-
-            if(Uri.TryCreate(endpoint, UriKind.Absolute, out var uri))
+            var endpointUri = RenderLogEvent(endpoint, LogEventInfo.CreateNullEvent());
+            if(Uri.TryCreate(endpointUri, UriKind.Absolute, out var uri))
             {
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                 {
