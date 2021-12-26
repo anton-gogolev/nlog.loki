@@ -9,7 +9,7 @@ jobs:
   build:
     env:
       # Nuget package version. Change it to publish a new version.
-      version: 1.0.6
+      version: 1.0.7
 
     name: Publish NuGet Package
 
