@@ -20,3 +20,10 @@ jobs:
       run: dotnet build .\\src\\NLog.Loki.sln --configuration Release --no-restore
     - name: Test
       run: dotnet test .\\src\\NLog.Loki.sln --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+
+    - uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./**/coverage.cobertura.xml
+        fail_ci_if_error: true
+        verbose: true
