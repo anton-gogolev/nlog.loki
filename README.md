@@ -33,7 +33,11 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
   </extensions>
 
   <targets async="true">
-    <target name="loki" xsi:type="loki" endpoint="http://localhost:3100">
+    <target 
+      name="loki" 
+      xsi:type="loki"
+      endpoint="http://localhost:3100"
+      layout="${level}|${message}${onexception:|${exception:format=type,message,method:maxInnerExceptionLevel=5:innerFormat=shortType,message,method}}|source=${logger}">
       <!-- Loki requires at least one label associated with the log stream. 
       Make sure you specify at least one label here. -->
       <label name="level" layout="${level:lowercase=true}" />
