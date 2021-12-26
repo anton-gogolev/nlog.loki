@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: dotnet build .\\src\\NLog.Loki.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test .\\src\\NLog.Loki.sln --no-restore --verbosity normal
+      run: dotnet test .\\src\\NLog.Loki.sln --no-restore --verbosity normal --collect:"XPlat Code Coverage"
