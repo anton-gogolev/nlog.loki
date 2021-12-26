@@ -24,6 +24,6 @@ jobs:
     - uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./src/NLog.Loki.Test/TestResults
+        directory: ./src/NLog.Loki.Tests/TestResults
         fail_ci_if_error: true
         verbose: true
