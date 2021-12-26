@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/anton-gogolev/nlog.loki/workflows/CI/badge.svg?branch=master)
 
-This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki](https://grafana.com/oss/loki/).
+This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki](https://grafana.com/oss/loki/) using Loki's HTTP Push API.
 
 > Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation system inspired by Prometheus. It is designed to be very cost effective and easy to operate.
 
@@ -39,7 +39,9 @@ You can now add a Loki target [to your configuration file](https://github.com/nl
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <target name="loki" xsi:type="loki" endpoint="${environment:LOKI_ENDPOINT_URI}">
+  <target name="loki" xsi:type="loki" endpoint="http://localhost:3100">
+    <!-- Loki requires at least one label associated with the log stream. 
+    Make sure you specify at least one label here. -->
     <label name="level" layout="${level:lowercase=true}" />
     <label name="server" layout="${hostname:lowercase=true}" />
   </target>
