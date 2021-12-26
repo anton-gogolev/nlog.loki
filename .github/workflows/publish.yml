@@ -27,7 +27,7 @@ jobs:
       run: dotnet build .\\src\\NLog.Loki.sln --configuration Release --no-restore
     - name: Publish
       id: publish
-      uses: rohith/publish-nuget@v2
+      uses: alirezanet/publish-nuget@v3.0.0
       with:
         PROJECT_FILE_PATH: ./src/NLog.Loki/NLog.Loki.csproj
         VERSION_STATIC: ${{env.version}}
