@@ -22,31 +22,24 @@ NuGet command:
 
 ## Usage
 
-Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `CorentinAltepe.NLog.Loki` as an extension assembly with NLog:
+Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `CorentinAltepe.NLog.Loki` as an extension assembly with NLog. You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
+  
   <extensions>
     <add assembly="CorentinAltepe.NLog.Loki" />
   </extensions>
 
-</nlog>
-```
-
-You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
-
-```xml
-<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-  <target name="loki" xsi:type="loki" endpoint="http://localhost:3100">
-    <!-- Loki requires at least one label associated with the log stream. 
-    Make sure you specify at least one label here. -->
-    <label name="level" layout="${level:lowercase=true}" />
-    <label name="server" layout="${hostname:lowercase=true}" />
-  </target>
+  <targets async="true">
+    <target name="loki" xsi:type="loki" endpoint="http://localhost:3100">
+      <!-- Loki requires at least one label associated with the log stream. 
+      Make sure you specify at least one label here. -->
+      <label name="level" layout="${level:lowercase=true}" />
+      <label name="server" layout="${hostname:lowercase=true}" />
+    </target>
+  </targets>
 
   <rules>
     <logger name="*" minlevel="Info" writeTo="loki" />
