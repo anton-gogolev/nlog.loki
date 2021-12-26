@@ -1,7 +1,7 @@
 # NLog Loki Target
 
 ![CI](https://github.com/corentinaltepe/nlog.loki/workflows/CI/badge.svg?branch=master)
-[![NuGet](https://img.shields.io/nuget/v/nlog.svg)](https://img.shields.io/nuget/v/CorentinAltepe.NLog.Loki)
+[![NuGet](https://img.shields.io/nuget/v/CorentinAltepe.NLog.Loki)](https://www.nuget.org/packages/CorentinAltepe.NLog.Loki)
 
 This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki](https://grafana.com/oss/loki/) using Loki's HTTP Push API.
 
