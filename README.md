@@ -10,26 +10,26 @@ This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki
 
 ## Installation
 
-The NLog.Loki NuGet package can be found [here](https://www.nuget.org/packages/NLog.Loki). You can install it via one of the following commands below:
+The NLog.Loki NuGet package can be found [here](https://www.nuget.org/packages/CorentinAltepe.NLog.Loki). You can install it via one of the following commands below:
 
 NuGet command:
 
-    Install-Package NLog.Loki
+    Install-Package CorentinAltepe.NLog.Loki
 
 .NET Core CLI command:
 
-    dotnet add package NLog.Loki
+    dotnet add package CorentinAltepe.NLog.Loki
 
 ## Usage
 
-Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `NLog.Loki` as an extension assembly with NLog:
+Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `CorentinAltepe.NLog.Loki` as an extension assembly with NLog:
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <extensions>
-    <add assembly="NLog.Loki" />
+    <add assembly="CorentinAltepe.NLog.Loki" />
   </extensions>
 
 </nlog>
