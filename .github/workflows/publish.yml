@@ -19,10 +19,10 @@ jobs:
         dotnet-version: 6.0.100
     - name: Install Dependencies
       run: dotnet restore .\\src\\NLog.Loki.sln
-    - name: Build
-      run: dotnet build .\\src\\NLog.Loki.sln --configuration Release --no-restore
-    - name: Package
-      run: dotnet pack .\\src\\NLog.Loki\\NLog.Loki.csproj --no-restore --output .
+    # - name: Build
+    #   run: dotnet build .\\src\\NLog.Loki.sln --configuration Release --no-restore
+    # - name: Package
+    #   run: dotnet pack .\\src\\NLog.Loki\\NLog.Loki.csproj --no-restore --output .
     - name: Publish
       id: publish
       uses: rohith/publish-nuget@v2
@@ -31,3 +31,4 @@ jobs:
         VERSION_FILE_PATH: ./.semver
         VERSION_REGEX: ^(.*)$
         NUGET_KEY: ${{secrets.NUGET_KEY}}
+        INCLUDE_SYMBOLS: true
