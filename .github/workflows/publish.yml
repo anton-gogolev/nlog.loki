@@ -7,6 +7,10 @@ on:
 
 jobs:
   build:
+    env:
+      # Nuget package version. Change it to publish a new version.
+      version: 1.0.3
+
     name: Publish NuGet Package
 
     runs-on: ubuntu-latest
@@ -28,7 +32,6 @@ jobs:
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: ./src/NLog.Loki/NLog.Loki.csproj
-        VERSION_FILE_PATH: ./.semver
-        VERSION_REGEX: ^(.*)$
+        VERSION_STATIC: ${{version}}
         NUGET_KEY: ${{secrets.NUGET_KEY}}
         INCLUDE_SYMBOLS: true
