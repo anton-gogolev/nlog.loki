@@ -32,6 +32,6 @@ jobs:
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: ./src/NLog.Loki/NLog.Loki.csproj
-        VERSION_STATIC: ${{version}}
+        VERSION_STATIC: ${{env.version}}
         NUGET_KEY: ${{secrets.NUGET_KEY}}
         INCLUDE_SYMBOLS: true
