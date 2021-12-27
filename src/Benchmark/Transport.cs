@@ -11,6 +11,7 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class Transport
 {
+    private readonly IList<LokiEvent> manyLokiEvents;
     private readonly IList<LokiEvent> lokiEvents = new List<LokiEvent> {
         new(
             new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
@@ -19,9 +20,22 @@ public class Transport
     private readonly HttpLokiTransport transport = new(new LokiHttpClient(
         new HttpClient { BaseAddress = new Uri("http://localhost:3100") }));
 
+    public Transport()
+    {
+        manyLokiEvents = new List<LokiEvent>(1000);
+        for(var i = 0; i < 1000; i++)
+            manyLokiEvents.Add(new LokiEvent(lokiEvents[0].Labels, DateTime.Now, lokiEvents[0].Line));
+    }
+
     [Benchmark]
     public async Task WriteLogEventsAsync()
     {
         await transport.WriteLogEventsAsync(lokiEvents).ConfigureAwait(false);
+    }
+
+    [Benchmark]
+    public async Task ManyWriteLogEventsAsync()
+    {
+        await transport.WriteLogEventsAsync(manyLokiEvents).ConfigureAwait(false);
     }
 }
