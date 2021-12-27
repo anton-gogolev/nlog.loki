@@ -32,10 +32,14 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
     <add assembly="CorentinAltepe.NLog.Loki" />
   </extensions>
 
-  <targets async="true">
+  <!-- Loki target is async, so there is no need to wrap it in an async target wrapper. -->
+  <targets>
     <target 
       name="loki" 
       xsi:type="loki"
+      batchSize="200"
+      taskDelayMilliseconds="500"
+      queueLimit="10000"
       endpoint="http://localhost:3100"
       layout="${level}|${message}${onexception:|${exception:format=type,message,method:maxInnerExceptionLevel=5:innerFormat=shortType,message,method}}|source=${logger}">
       <!-- Loki requires at least one label associated with the log stream. 
