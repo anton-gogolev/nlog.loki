@@ -9,7 +9,7 @@ namespace NLog.Loki
     /// <remarks>
     /// See https://grafana.com/docs/loki/latest/api/#examples-4
     /// </remarks>
-    public class HttpLokiTransport : ILokiTransport
+    internal class HttpLokiTransport : ILokiTransport
     {
         private readonly LokiStreamsJsonSerializer lokiStreamsJsonSerializer = new();
         private readonly MediaTypeHeaderValue contentType = new("application/json");

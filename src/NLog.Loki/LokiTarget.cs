@@ -23,7 +23,7 @@ namespace NLog.Loki
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
 
-        public static Func<Uri, ILokiHttpClient> LokiHttpClientFactory { get; set; } = GetLokiHttpClient;
+        private static Func<Uri, ILokiHttpClient> LokiHttpClientFactory { get; } = GetLokiHttpClient;
 
         public LokiTarget()
         {

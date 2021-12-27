@@ -2,17 +2,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NLog.Loki.Model;
 
-namespace NLog.Loki
-{
-    public class NullLokiTransport : ILokiTransport
-    {
-        public void WriteLogEvents(IEnumerable<LokiEvent> lokiEvents)
-        {
-        }
+namespace NLog.Loki;
 
-        public Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
-        {
-            return Task.CompletedTask;
-        }
-    }
+internal class NullLokiTransport : ILokiTransport
+{
+    public void WriteLogEvents(IEnumerable<LokiEvent> lokiEvents) { }
+    public Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents) => Task.CompletedTask;
 }

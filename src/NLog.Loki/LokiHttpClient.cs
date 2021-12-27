@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NLog.Loki
 {
-    public class LokiHttpClient : ILokiHttpClient
+    internal class LokiHttpClient : ILokiHttpClient
     {
         private readonly HttpClient httpClient;
 

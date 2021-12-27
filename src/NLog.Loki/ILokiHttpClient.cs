@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NLog.Loki
 {
-    public interface ILokiHttpClient
+    internal interface ILokiHttpClient
     {
         Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent httpContent);
     }

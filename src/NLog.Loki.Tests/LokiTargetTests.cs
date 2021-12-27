@@ -35,12 +35,10 @@ namespace NLog.Loki.Tests
         [Test]
         public void Write()
         {
-            var stringBuilder = new StringBuilder();
-            LokiTarget.LokiHttpClientFactory = _ => new NullLokiHttpClient(stringBuilder);
-
             var configuration = new LoggingConfiguration();
-            
-            var lokiTarget = new LokiTarget {
+
+            var lokiTarget = new LokiTarget
+            {
                 Endpoint = "http://grafana.lvh.me:3100",
                 IncludeMdlc = true,
                 Labels = {
@@ -59,10 +57,10 @@ namespace NLog.Loki.Tests
                 }
             };
 
-            var target =
-                new BufferingTargetWrapper(lokiTarget) {
-                    BufferSize = 500
-                };
+            var target = new BufferingTargetWrapper(lokiTarget)
+            {
+                BufferSize = 500
+            };
 
             configuration.AddTarget("loki", target);
 
@@ -99,12 +97,9 @@ namespace NLog.Loki.Tests
                 {
                     log.Error(e);
                 }
-
             }
 
             LogManager.Shutdown();
-
-            Console.WriteLine(stringBuilder.ToString());
         }
 
         [Test]
