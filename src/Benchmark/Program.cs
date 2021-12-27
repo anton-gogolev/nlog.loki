@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
 namespace Benchmark
@@ -6,7 +7,14 @@ namespace Benchmark
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Transport>();
+            var config = ManualConfig.Create(DefaultConfig.Instance)
+              .WithOptions(ConfigOptions.JoinSummary)
+              .WithOptions(ConfigOptions.DisableLogFile);
+
+            var summary = BenchmarkRunner.Run(new[]{
+                BenchmarkConverter.TypeToBenchmarks( typeof(Benchmarks), config),
+                BenchmarkConverter.TypeToBenchmarks( typeof(Transport), config)
+            });
         }
     }
 }
