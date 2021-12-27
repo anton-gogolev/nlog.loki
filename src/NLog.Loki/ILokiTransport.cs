@@ -7,5 +7,6 @@ namespace NLog.Loki
     public interface ILokiTransport
     {
         Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents);
+        Task WriteLogEventsAsync(LokiEvent lokiEvent);
     }
 }

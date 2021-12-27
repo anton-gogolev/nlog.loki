@@ -6,6 +6,6 @@ namespace NLog.Loki;
 
 internal class NullLokiTransport : ILokiTransport
 {
-    public void WriteLogEvents(IEnumerable<LokiEvent> lokiEvents) { }
     public Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents) => Task.CompletedTask;
+    public Task WriteLogEventsAsync(LokiEvent lokiEvent) => Task.CompletedTask;
 }

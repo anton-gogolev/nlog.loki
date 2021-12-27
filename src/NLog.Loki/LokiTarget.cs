@@ -18,7 +18,7 @@ namespace NLog.Loki
         private readonly Lazy<ILokiTransport> lazyLokiTransport;
 
         [RequiredParameter]
-        public Layout Endpoint { get; set; }
+        public Layout Endpoint { get; init; }
 
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
@@ -44,15 +44,12 @@ namespace NLog.Loki
         protected override Task WriteAsyncTask(LogEventInfo logEvent, CancellationToken cancellationToken)
         {
             var @event = GetLokiEvent(logEvent);
-
-            // TODO: implement a special serializer to avoid embedding the even in a new array, which will save an allocation.
-            return lazyLokiTransport.Value.WriteLogEventsAsync(new[] { @event });
+            return lazyLokiTransport.Value.WriteLogEventsAsync(@event);
         }
 
         protected override Task WriteAsyncTask(IList<LogEventInfo> logEvents, CancellationToken cancellationToken)
         {
             var events = GetLokiEvents(logEvents);
-
             return lazyLokiTransport.Value.WriteLogEventsAsync(events);
         }
 

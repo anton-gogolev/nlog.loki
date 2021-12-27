@@ -16,6 +16,7 @@ namespace NLog.Loki
         static HttpLokiTransport()
         {
             JsonOptions = new JsonSerializerOptions();
+            JsonOptions.Converters.Add(new LokiEventsSerializer());
             JsonOptions.Converters.Add(new LokiEventSerializer());
         }
 
@@ -29,6 +30,12 @@ namespace NLog.Loki
         public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
         {
             using var jsonStreamContent = JsonContent.Create(lokiEvents, options: JsonOptions);
+            _ = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
+        }
+
+        public async Task WriteLogEventsAsync(LokiEvent lokiEvent)
+        {
+            using var jsonStreamContent = JsonContent.Create(lokiEvent, options: JsonOptions);
             _ = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
         }
     }
