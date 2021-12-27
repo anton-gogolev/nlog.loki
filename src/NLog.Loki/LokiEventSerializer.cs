@@ -9,9 +9,7 @@ using NLog.Loki.Model;
 namespace NLog.Loki;
 
 /// <summary>
-/// Alternative to LokiStreamsJsonSerializer. Used to serialize log events to json
-/// for loki before sending them to the push HTTP API. This implementation aims
-/// at being more efficient than the currently used LokiStreamsJsonSerializer.
+/// Serializes log events to json for loki before sending them to the push HTTP API.
 /// </summary>
 internal class LokiEventSerializer : JsonConverter<IEnumerable<LokiEvent>>
 {

@@ -45,6 +45,7 @@ namespace NLog.Loki
         {
             var @event = GetLokiEvent(logEvent);
 
+            // TODO: implement a special serializer to avoid embedding the even in a new array, which will save an allocation.
             return lazyLokiTransport.Value.WriteLogEventsAsync(new[] { @event });
         }
 
