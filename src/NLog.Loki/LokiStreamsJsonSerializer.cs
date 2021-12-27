@@ -8,24 +8,17 @@ using NLog.Loki.Model;
 
 namespace NLog.Loki
 {
-    /// <summary>
-    /// 
-    /// </summary>
     /// <remarks>
     /// See https://grafana.com/docs/loki/latest/api/#examples-4
     /// </remarks>
     internal class LokiStreamsJsonSerializer : IJsonSerializer
     {
-        private static readonly DateTime UnixEpoch =
-            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        public async Task SerializeAsync(object instance, JsonTextWriter jsonTextWriter)
+        public async Task SerializeAsync(IEnumerable<LokiEvent> instance, JsonTextWriter jsonTextWriter)
         {
             var j = jsonTextWriter;
-            var events = (IEnumerable<LokiEvent>)instance;
-
-            var streams =
-                events.GroupBy(le => le.Labels);
+            var streams = instance.GroupBy(le => le.Labels);
 
             using(await j.WriteObjectAsync())
             {
@@ -47,9 +40,8 @@ namespace NLog.Loki
                                 {
                                     using(await j.WriteArrayAsync())
                                     {
-                                        var timestamp =
-                                            ToUnixTimeNs(@event.Timestamp).
-                                                ToString("g", CultureInfo.InvariantCulture);
+                                        var timestamp = ToUnixTimeNs(@event.Timestamp)
+                                            .ToString("g", CultureInfo.InvariantCulture);
 
                                         await j.WriteValueAsync(timestamp);
                                         await j.WriteValueAsync(@event.Line);
@@ -63,9 +55,6 @@ namespace NLog.Loki
         }
 
         private static long ToUnixTimeNs(DateTime dateTime)
-        {
-            var unixTimeNs = (long)(dateTime.ToUniversalTime() - UnixEpoch).Ticks * 100;
-            return unixTimeNs;
-        }
+            => (dateTime.ToUniversalTime() - UnixEpoch).Ticks * 100;
     }
 }
