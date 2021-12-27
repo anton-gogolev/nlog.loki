@@ -1,0 +1,21 @@
+version: "3"
+
+# Runs loki as a docker container, enabling running the benchmark.
+  
+services:
+  loki:
+    image: grafana/loki
+    container_name: loki
+    restart: unless-stopped
+    volumes:
+      - ./loki-config.yml/:/etc/loki/local-config.yaml
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"

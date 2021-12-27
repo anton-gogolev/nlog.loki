@@ -1,6 +1,8 @@
 # NLog Loki Target
 
-![CI](https://github.com/anton-gogolev/nlog.loki/workflows/CI/badge.svg?branch=master)
+![CI](https://github.com/corentinaltepe/nlog.loki/workflows/CI/badge.svg?branch=master)
+[![NuGet](https://img.shields.io/nuget/v/CorentinAltepe.NLog.Loki)](https://www.nuget.org/packages/CorentinAltepe.NLog.Loki)
+[![codecov](https://codecov.io/gh/corentinaltepe/nlog.loki/branch/master/graph/badge.svg?token=84N5XB4J09)](https://codecov.io/gh/corentinaltepe/nlog.loki)
 
 This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki](https://grafana.com/oss/loki/) using Loki's HTTP Push API.
 
@@ -8,43 +10,40 @@ This is an [NLog](https://nlog-project.org/) target that sends messages to [Loki
 
 ## Installation
 
-The NLog.Loki NuGet package can be found [here](https://www.nuget.org/packages/NLog.Loki). You can install it via one of the following commands below:
+The NLog.Loki NuGet package can be found [here](https://www.nuget.org/packages/CorentinAltepe.NLog.Loki). You can install it via one of the following commands below:
 
 NuGet command:
 
-    Install-Package NLog.Loki
+    Install-Package CorentinAltepe.NLog.Loki
 
 .NET Core CLI command:
 
-    dotnet add package NLog.Loki
+    dotnet add package CorentinAltepe.NLog.Loki
 
 ## Usage
 
-Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `NLog.Loki` as an extension assembly with NLog:
+Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `CorentinAltepe.NLog.Loki` as an extension assembly with NLog. You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
+  
   <extensions>
-    <add assembly="NLog.Loki" />
+    <add assembly="CorentinAltepe.NLog.Loki" />
   </extensions>
 
-</nlog>
-```
-
-You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
-
-```xml
-<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-  <target name="loki" xsi:type="loki" endpoint="http://localhost:3100">
-    <!-- Loki requires at least one label associated with the log stream. 
-    Make sure you specify at least one label here. -->
-    <label name="level" layout="${level:lowercase=true}" />
-    <label name="server" layout="${hostname:lowercase=true}" />
-  </target>
+  <targets async="true">
+    <target 
+      name="loki" 
+      xsi:type="loki"
+      endpoint="http://localhost:3100"
+      layout="${level}|${message}${onexception:|${exception:format=type,message,method:maxInnerExceptionLevel=5:innerFormat=shortType,message,method}}|source=${logger}">
+      <!-- Loki requires at least one label associated with the log stream. 
+      Make sure you specify at least one label here. -->
+      <label name="level" layout="${level:lowercase=true}" />
+      <label name="server" layout="${hostname:lowercase=true}" />
+    </target>
+  </targets>
 
   <rules>
     <logger name="*" minlevel="Info" writeTo="loki" />

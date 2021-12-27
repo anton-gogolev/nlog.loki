@@ -23,7 +23,7 @@ namespace NLog.Loki
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
 
-        public static Func<Uri, ILokiHttpClient> LokiHttpClientFactory { get; set; } = GetLokiHttpClient;
+        private static Func<Uri, ILokiHttpClient> LokiHttpClientFactory { get; } = GetLokiHttpClient;
 
         public LokiTarget()
         {
@@ -45,6 +45,7 @@ namespace NLog.Loki
         {
             var @event = GetLokiEvent(logEvent);
 
+            // TODO: implement a special serializer to avoid embedding the even in a new array, which will save an allocation.
             return lazyLokiTransport.Value.WriteLogEventsAsync(new[] { @event });
         }
 
@@ -82,7 +83,7 @@ namespace NLog.Loki
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                 {
                     var lokiHttpClient = LokiHttpClientFactory(uri);
-                    var httpLokiTransport = new HttpLokiTransport(uri, lokiHttpClient);
+                    var httpLokiTransport = new HttpLokiTransport(lokiHttpClient);
 
                     return httpLokiTransport;
                 }

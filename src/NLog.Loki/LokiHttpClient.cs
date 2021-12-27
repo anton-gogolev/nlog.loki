@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NLog.Loki
 {
-    public class LokiHttpClient : ILokiHttpClient
+    internal class LokiHttpClient : ILokiHttpClient
     {
         private readonly HttpClient httpClient;
 
@@ -12,9 +12,9 @@ namespace NLog.Loki
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent httpContent)
+        public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent httpContent)
         {
-            return await httpClient.PostAsync(requestUri, httpContent);
+            return httpClient.PostAsync(requestUri, httpContent);
         }
     }
 }

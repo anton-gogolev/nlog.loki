@@ -1,25 +1,27 @@
-using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
-using NLog.Loki.Impl;
 using NLog.Loki.Model;
 
 namespace NLog.Loki
 {
-    /// <summary>
-    /// 
-    /// </summary>
     /// <remarks>
     /// See https://grafana.com/docs/loki/latest/api/#examples-4
     /// </remarks>
-    public class HttpLokiTransport : ILokiTransport
+    internal class HttpLokiTransport : ILokiTransport
     {
-        private readonly LokiStreamsJsonSerializer lokiStreamsJsonSerializer = new LokiStreamsJsonSerializer();
-        private readonly MediaTypeHeaderValue contentType = new MediaTypeHeaderValue("application/json");
+        private static readonly JsonSerializerOptions JsonOptions;
+
+        static HttpLokiTransport()
+        {
+            JsonOptions = new JsonSerializerOptions();
+            JsonOptions.Converters.Add(new LokiEventSerializer());
+        }
+
         private readonly ILokiHttpClient lokiHttpClient;
 
-        public HttpLokiTransport(Uri uri, ILokiHttpClient lokiHttpClient)
+        public HttpLokiTransport(ILokiHttpClient lokiHttpClient)
         {
             this.lokiHttpClient = lokiHttpClient;
         }
@@ -31,10 +33,8 @@ namespace NLog.Loki
 
         public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
         {
-            using(var jsonStreamContent = new JsonStreamContent(contentType, lokiEvents, lokiStreamsJsonSerializer))
-            {
-                var httpResponse = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent);
-            }
+            using var jsonStreamContent = JsonContent.Create(lokiEvents, options: JsonOptions);
+            _ = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
         }
     }
 }
