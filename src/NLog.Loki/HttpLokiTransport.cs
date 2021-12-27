@@ -26,11 +26,6 @@ namespace NLog.Loki
             this.lokiHttpClient = lokiHttpClient;
         }
 
-        public void WriteLogEvents(IEnumerable<LokiEvent> lokiEvents)
-        {
-            WriteLogEventsAsync(lokiEvents).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
         public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
         {
             using var jsonStreamContent = JsonContent.Create(lokiEvents, options: JsonOptions);
