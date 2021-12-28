@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog.Common;
@@ -20,10 +21,14 @@ namespace NLog.Loki
         [RequiredParameter]
         public Layout Endpoint { get; init; }
 
+        public Layout Username { get; init; }
+
+        public Layout Password { get; init; }
+
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
 
-        private static Func<Uri, ILokiHttpClient> LokiHttpClientFactory { get; } = GetLokiHttpClient;
+        private static Func<Uri, string, string, ILokiHttpClient> LokiHttpClientFactory { get; } = GetLokiHttpClient;
 
         public LokiTarget()
         {
@@ -31,7 +36,7 @@ namespace NLog.Loki
 
             lazyLokiTransport =
                 new Lazy<ILokiTransport>(
-                    () => GetLokiTransport(Endpoint),
+                    () => GetLokiTransport(Endpoint, Username, Password),
                     LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
@@ -72,14 +77,16 @@ namespace NLog.Loki
             return @event;
         }
 
-        internal ILokiTransport GetLokiTransport(Layout endpoint)
+        internal ILokiTransport GetLokiTransport(Layout endpoint, Layout username, Layout password)
         {
             var endpointUri = RenderLogEvent(endpoint, LogEventInfo.CreateNullEvent());
+            var usr = RenderLogEvent(username, LogEventInfo.CreateNullEvent());
+            var pwd = RenderLogEvent(password, LogEventInfo.CreateNullEvent());
             if(Uri.TryCreate(endpointUri, UriKind.Absolute, out var uri))
             {
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                 {
-                    var lokiHttpClient = LokiHttpClientFactory(uri);
+                    var lokiHttpClient = LokiHttpClientFactory(uri, usr, pwd);
                     var httpLokiTransport = new HttpLokiTransport(lokiHttpClient);
 
                     return httpLokiTransport;
@@ -93,9 +100,15 @@ namespace NLog.Loki
             return nullLokiTransport;
         }
 
-        internal static ILokiHttpClient GetLokiHttpClient(Uri uri)
+        internal static ILokiHttpClient GetLokiHttpClient(Uri uri, string username, string password)
         {
             var httpClient = new HttpClient { BaseAddress = uri };
+            if(!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                var byteArray = Encoding.ASCII.GetBytes($"{username}:{password}");
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            }
+
             var lokiHttpClient = new LokiHttpClient(httpClient);
 
             return lokiHttpClient;

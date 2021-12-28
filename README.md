@@ -29,7 +29,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   
   <extensions>
-    <add assembly="CorentinAltepe.NLog.Loki" />
+    <add assembly="NLog.Loki" />
   </extensions>
 
   <!-- Loki target is async, so there is no need to wrap it in an async target wrapper. -->
