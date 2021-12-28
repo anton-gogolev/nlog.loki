@@ -22,14 +22,14 @@ NuGet command:
 
 ## Usage
 
-Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `CorentinAltepe.NLog.Loki` as an extension assembly with NLog. You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
+Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Register-your-custom-component) `NLog.Loki` as an extension assembly with NLog. You can now add a Loki target [to your configuration file](https://github.com/nlog/nlog/wiki/Tutorial#Configure-NLog-Targets-for-output):
 
 ```xml
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   
   <extensions>
-    <add assembly="CorentinAltepe.NLog.Loki" />
+    <add assembly="NLog.Loki" />
   </extensions>
 
   <!-- Loki target is async, so there is no need to wrap it in an async target wrapper. -->
@@ -41,6 +41,8 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
       taskDelayMilliseconds="500"
       queueLimit="10000"
       endpoint="http://localhost:3100"
+      username="myusername"
+      password="secret"
       layout="${level}|${message}${onexception:|${exception:format=type,message,method:maxInnerExceptionLevel=5:innerFormat=shortType,message,method}}|source=${logger}">
       <!-- Loki requires at least one label associated with the log stream. 
       Make sure you specify at least one label here. -->
@@ -57,5 +59,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 ```
 
 The `@endpoint` attribute is a [Layout](https://github.com/NLog/NLog/wiki/Layouts) that must ultimately resolve to a fully-qualified absolute URL of the Loki Server when running in a [Single Proccess Mode](https://grafana.com/docs/loki/latest/overview/#modes-of-operation) or of the Loki Distributor when running in [Microservices Mode](https://grafana.com/docs/loki/latest/overview/#distributor). When an invalid URI is encountered, all log messages are silently discarded.
+
+`username` and `password` are optional fields, used for basic authentication with Loki.
 
 `label` elements can be used to enrich messages with additional [labels](https://grafana.com/docs/loki/latest/design-documents/labels/). `label/@layout` support usual NLog layout renderers.
