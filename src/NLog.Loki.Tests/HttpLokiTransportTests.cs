@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Moq;
 using NLog.Loki.Model;
@@ -11,12 +12,10 @@ namespace NLog.Loki.Tests;
 
 public class HttpLokiTransportTests
 {
-    [Test]
-    public async Task SerializeMessageToHttpLoki()
+    private static List<LokiEvent> CreateLokiEvents()
     {
-        // Prepare the events to be sent to loki
         var date = new DateTime(2021, 12, 27, 9, 48, 26, DateTimeKind.Utc);
-        var events = new List<LokiEvent> {
+        return new List<LokiEvent> {
             new(new LokiLabels(new LokiLabel("env", "unittest"), new LokiLabel("job", "Job1")),
                 date, "Info|Receive message from A with destination B."),
             new(new LokiLabels(new LokiLabel("env", "unittest"), new LokiLabel("job", "Job1")),
@@ -24,6 +23,13 @@ public class HttpLokiTransportTests
             new(new LokiLabels(new LokiLabel("env", "unittest"), new LokiLabel("job", "Job1")),
                 date, "Info|Event from another stream."),
         };
+    }
+
+    [Test]
+    public async Task SerializeMessageToHttpLoki()
+    {
+        // Prepare the events to be sent to loki
+        var events = CreateLokiEvents();
 
         // Configure the ILokiHttpClient such that we intercept the JSON content and simulate an OK response from Loki.
         string serializedJsonMessage = null;
@@ -50,11 +56,7 @@ public class HttpLokiTransportTests
     public async Task SerializeMessageToHttpLokiSingleEvent()
     {
         // Prepare the event to be sent to loki
-        var date = new DateTime(2021, 12, 27, 9, 48, 26, DateTimeKind.Utc);
-        var lokiEvent = new LokiEvent(
-            new LokiLabels(new LokiLabel("env", "unittest"), new LokiLabel("job", "Job1")),
-            new DateTime(2021, 12, 27, 9, 48, 26, DateTimeKind.Utc),
-            "Info|Event from another stream.");
+        var lokiEvent = CreateLokiEvents()[2];
 
         // Configure the ILokiHttpClient such that we intercept the JSON content and simulate an OK response from Loki.
         string serializedJsonMessage = null;
@@ -75,5 +77,37 @@ public class HttpLokiTransportTests
         Assert.AreEqual(
                     "{\"streams\":[{\"stream\":{\"env\":\"unittest\",\"job\":\"Job1\"},\"values\":[[\"1640598506000000000\",\"Info|Event from another stream.\"]]}]}",
                     serializedJsonMessage);
+    }
+
+    [Test]
+    public void ThrowOnHttpClientException() 
+    {
+        var httpClient = new Mock<ILokiHttpClient>();
+        _ = httpClient
+            .Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
+            .ThrowsAsync(new Exception("Something went wrong whem sending HTTP message."));
+        
+        // Send the logging request
+        var transport = new HttpLokiTransport(httpClient.Object);
+        var exception = Assert.ThrowsAsync<Exception>(() => transport.WriteLogEventsAsync(CreateLokiEvents()));
+        Assert.AreEqual("Something went wrong whem sending HTTP message.", exception.Message);
+    }
+
+    [Test]
+    public void ThrowOnNonSuccessResponseCode() 
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.Conflict) {
+            Content = JsonContent.Create(new {reason = "A stream must have a least one label."}),
+        };
+        var httpClient = new Mock<ILokiHttpClient>();
+        _ = httpClient
+            .Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
+            .Returns(Task.FromResult(response));
+        
+        // Send the logging request
+        var transport = new HttpLokiTransport(httpClient.Object);
+        var exception = Assert.ThrowsAsync<HttpRequestException>(() => transport.WriteLogEventsAsync(CreateLokiEvents()));
+        Assert.AreEqual("Failed pushing logs to Loki.", exception.Message);
+        Assert.AreEqual(HttpStatusCode.Conflict, exception.StatusCode);
     }
 }
