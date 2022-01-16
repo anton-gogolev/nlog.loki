@@ -18,12 +18,12 @@ public class Transport
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".")};
     private readonly HttpLokiTransport transport = new(new LokiHttpClient(
-        new HttpClient { BaseAddress = new Uri("http://localhost:3100") }));
+        new HttpClient { BaseAddress = new Uri("http://localhost:3100") }), false);
 
     public Transport()
     {
-        manyLokiEvents = new List<LokiEvent>(1000);
-        for(var i = 0; i < 1000; i++)
+        manyLokiEvents = new List<LokiEvent>(100);
+        for(var i = 0; i < 100; i++)
             manyLokiEvents.Add(new LokiEvent(lokiEvents[0].Labels, DateTime.Now, lokiEvents[0].Line));
     }
 
