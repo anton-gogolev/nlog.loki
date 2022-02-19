@@ -1,6 +1,6 @@
 # NLog Loki Target
 
-![CI](https://github.com/corentinaltepe/nlog.loki/workflows/CI/badge.svg?branch=master)
+![Build](https://github.com/corentinaltepe/nlog.loki/workflows/Build/badge.svg)
 [![NuGet](https://img.shields.io/nuget/v/NLog.Targets.Loki)](https://www.nuget.org/packages/NLog.Targets.Loki)
 [![codecov](https://codecov.io/gh/corentinaltepe/nlog.loki/branch/master/graph/badge.svg?token=84N5XB4J09)](https://codecov.io/gh/corentinaltepe/nlog.loki)
 
