@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -18,7 +19,7 @@ public class Transport
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".")};
     private readonly HttpLokiTransport _transport = new(new LokiHttpClient(
-        new HttpClient { BaseAddress = new Uri("http://localhost:3100") }), false);
+        new HttpClient { BaseAddress = new Uri("http://localhost:3100") }), false, CompressionLevel.NoCompression);
 
     public Transport()
     {

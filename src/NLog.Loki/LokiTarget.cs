@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -31,6 +32,12 @@ namespace NLog.Loki
         /// See <see href="https://grafana.com/docs/loki/latest/configuration/#accept-out-of-order-writes"/>.
         /// </summary>
         public bool OrderWrites { get; set; } = true;
+
+        /// <summary>
+        /// Defines if the HTTP messages sent to Loki must be gzip compressed, and with which compression level.
+        /// Possible values: NoCompression (default), Optimal, Fastest and SmallestSize (.NET 6 support only).
+        /// </summary>
+        public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.NoCompression;
 
         [ArrayParameter(typeof(LokiTargetLabel), "label")]
         public IList<LokiTargetLabel> Labels { get; }
@@ -92,7 +99,7 @@ namespace NLog.Loki
             if(Uri.TryCreate(endpointUri, UriKind.Absolute, out var uri))
             {
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
-                    return new HttpLokiTransport(LokiHttpClientFactory(uri, usr, pwd), orderWrites);
+                    return new HttpLokiTransport(LokiHttpClientFactory(uri, usr, pwd), orderWrites, CompressionLevel);
             }
 
             InternalLogger.Warn("Unable to create a valid Loki Endpoint URI from '{0}'", endpoint);

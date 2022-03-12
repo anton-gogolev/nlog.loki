@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -15,11 +16,15 @@ internal sealed class HttpLokiTransport : ILokiTransport
 {
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly ILokiHttpClient _lokiHttpClient;
+    private readonly CompressionLevel _gzipLevel;
 
-    public HttpLokiTransport(ILokiHttpClient lokiHttpClient, bool orderWrites)
+    public HttpLokiTransport(
+        ILokiHttpClient lokiHttpClient,
+        bool orderWrites,
+        CompressionLevel gzipLevel)
     {
         _lokiHttpClient = lokiHttpClient;
-
+        _gzipLevel = gzipLevel;
         _jsonOptions = new JsonSerializerOptions();
         _jsonOptions.Converters.Add(new LokiEventsSerializer(orderWrites));
         _jsonOptions.Converters.Add(new LokiEventSerializer());
@@ -27,16 +32,31 @@ internal sealed class HttpLokiTransport : ILokiTransport
 
     public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
     {
-        using var jsonStreamContent = JsonContent.Create(lokiEvents, options: _jsonOptions);
+        using var jsonStreamContent = CreateContent(lokiEvents);
         using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
         await ValidateHttpResponse(response);
     }
 
     public async Task WriteLogEventsAsync(LokiEvent lokiEvent)
     {
-        using var jsonStreamContent = JsonContent.Create(lokiEvent, options: _jsonOptions);
+        using var jsonStreamContent = CreateContent(lokiEvent);
         using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
         await ValidateHttpResponse(response);
+    }
+
+    /// <summary>
+    /// Prepares the HttpContent for the loki event(s).
+    /// If gzip compression is enabled, prepares a gzip stream with the appropriate headers.
+    /// </summary>
+    private HttpContent CreateContent<T>(T lokiEvent)
+    {
+        var jsonContent = JsonContent.Create(lokiEvent, options: _jsonOptions);
+
+        // If no compression required
+        if(_gzipLevel == CompressionLevel.NoCompression)
+            return jsonContent;
+
+        return new CompressedContent(jsonContent, _gzipLevel);
     }
 
     private static async ValueTask ValidateHttpResponse(HttpResponseMessage response)

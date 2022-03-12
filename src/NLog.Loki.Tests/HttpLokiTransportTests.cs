@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -43,7 +44,7 @@ public class HttpLokiTransportTests
             });
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, orderWrites: false);
+        var transport = new HttpLokiTransport(httpClient.Object, orderWrites: false, CompressionLevel.NoCompression);
         await transport.WriteLogEventsAsync(events).ConfigureAwait(false);
 
         // Verify the json message format
@@ -70,7 +71,7 @@ public class HttpLokiTransportTests
             });
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, orderWrites: true);
+        var transport = new HttpLokiTransport(httpClient.Object, orderWrites: true, CompressionLevel.NoCompression);
         await transport.WriteLogEventsAsync(events).ConfigureAwait(false);
 
         // Verify the json message format
@@ -97,7 +98,7 @@ public class HttpLokiTransportTests
                 });
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, false);
+        var transport = new HttpLokiTransport(httpClient.Object, false, CompressionLevel.NoCompression);
         await transport.WriteLogEventsAsync(lokiEvent).ConfigureAwait(false);
 
         // Verify the json message format
@@ -115,7 +116,7 @@ public class HttpLokiTransportTests
             .ThrowsAsync(new Exception("Something went wrong whem sending HTTP message."));
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, false);
+        var transport = new HttpLokiTransport(httpClient.Object, false, CompressionLevel.NoCompression);
         var exception = Assert.ThrowsAsync<Exception>(() => transport.WriteLogEventsAsync(CreateLokiEvents()));
         Assert.AreEqual("Something went wrong whem sending HTTP message.", exception.Message);
     }
@@ -133,12 +134,12 @@ public class HttpLokiTransportTests
             .Returns(Task.FromResult(response));
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, false);
+        var transport = new HttpLokiTransport(httpClient.Object, false, CompressionLevel.NoCompression);
         var exception = Assert.ThrowsAsync<HttpRequestException>(() => transport.WriteLogEventsAsync(CreateLokiEvents()));
         Assert.AreEqual("Failed pushing logs to Loki.", exception.Message);
-        
-        #if NET6_0_OR_GREATER
-            Assert.AreEqual(HttpStatusCode.Conflict, exception.StatusCode);
-        #endif
+
+#if NET6_0_OR_GREATER
+        Assert.AreEqual(HttpStatusCode.Conflict, exception.StatusCode);
+#endif
     }
 }
