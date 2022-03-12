@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NLog.Loki.Model;
 
-namespace NLog.Loki
+namespace NLog.Loki;
+
+public interface ILokiTransport : IDisposable
 {
-    public interface ILokiTransport
-    {
-        Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents);
-        Task WriteLogEventsAsync(LokiEvent lokiEvent);
-    }
+    Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents);
+    Task WriteLogEventsAsync(LokiEvent lokiEvent);
 }

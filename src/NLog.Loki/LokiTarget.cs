@@ -16,7 +16,7 @@ namespace NLog.Loki
     [Target("loki")]
     public class LokiTarget : AsyncTaskTarget
     {
-        private readonly Lazy<ILokiTransport> lazyLokiTransport;
+        private readonly Lazy<ILokiTransport> _lazyLokiTransport;
 
         [RequiredParameter]
         public Layout Endpoint { get; set; }
@@ -41,27 +41,28 @@ namespace NLog.Loki
         {
             Labels = new List<LokiTargetLabel>();
 
-            lazyLokiTransport = new Lazy<ILokiTransport>(
+            _lazyLokiTransport = new Lazy<ILokiTransport>(
                 () => GetLokiTransport(Endpoint, Username, Password, OrderWrites),
                 LazyThreadSafetyMode.ExecutionAndPublication);
+            InitializeTarget();
         }
 
         protected override void Write(IList<AsyncLogEventInfo> logEvents)
         {
             var events = GetLokiEvents(logEvents.Select(alei => alei.LogEvent));
-            lazyLokiTransport.Value.WriteLogEventsAsync(events).ConfigureAwait(false).GetAwaiter().GetResult();
+            _lazyLokiTransport.Value.WriteLogEventsAsync(events).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         protected override Task WriteAsyncTask(LogEventInfo logEvent, CancellationToken cancellationToken)
         {
             var @event = GetLokiEvent(logEvent);
-            return lazyLokiTransport.Value.WriteLogEventsAsync(@event);
+            return _lazyLokiTransport.Value.WriteLogEventsAsync(@event);
         }
 
         protected override Task WriteAsyncTask(IList<LogEventInfo> logEvents, CancellationToken cancellationToken)
         {
             var events = GetLokiEvents(logEvents);
-            return lazyLokiTransport.Value.WriteLogEventsAsync(events);
+            return _lazyLokiTransport.Value.WriteLogEventsAsync(events);
         }
 
         private IEnumerable<LokiEvent> GetLokiEvents(IEnumerable<LogEventInfo> logEvents)
@@ -91,19 +92,11 @@ namespace NLog.Loki
             if(Uri.TryCreate(endpointUri, UriKind.Absolute, out var uri))
             {
                 if(uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
-                {
-                    var lokiHttpClient = LokiHttpClientFactory(uri, usr, pwd);
-                    var httpLokiTransport = new HttpLokiTransport(lokiHttpClient, orderWrites);
-
-                    return httpLokiTransport;
-                }
+                    return new HttpLokiTransport(LokiHttpClientFactory(uri, usr, pwd), orderWrites);
             }
 
             InternalLogger.Warn("Unable to create a valid Loki Endpoint URI from '{0}'", endpoint);
-
-            var nullLokiTransport = new NullLokiTransport();
-
-            return nullLokiTransport;
+            return new NullLokiTransport();
         }
 
         internal static ILokiHttpClient GetLokiHttpClient(Uri uri, string username, string password)
@@ -114,10 +107,22 @@ namespace NLog.Loki
                 var byteArray = Encoding.ASCII.GetBytes($"{username}:{password}");
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             }
+            return new LokiHttpClient(httpClient);
+        }
 
-            var lokiHttpClient = new LokiHttpClient(httpClient);
-
-            return lokiHttpClient;
+        private bool _isDisposed;
+        protected override void Dispose(bool isDisposing)
+        {
+            if(!_isDisposed)
+            {
+                if(isDisposing)
+                {
+                    if(_lazyLokiTransport.IsValueCreated)
+                        _lazyLokiTransport.Value.Dispose();
+                }
+                _isDisposed = true;
+            }
+            base.Dispose(isDisposing);
         }
     }
 }
