@@ -6,56 +6,61 @@ using System.Threading.Tasks;
 using NLog.Common;
 using NLog.Loki.Model;
 
-namespace NLog.Loki
+namespace NLog.Loki;
+
+/// <remarks>
+/// See https://grafana.com/docs/loki/latest/api/#examples-4
+/// </remarks>
+internal sealed class HttpLokiTransport : ILokiTransport
 {
-    /// <remarks>
-    /// See https://grafana.com/docs/loki/latest/api/#examples-4
-    /// </remarks>
-    internal class HttpLokiTransport : ILokiTransport
+    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly ILokiHttpClient _lokiHttpClient;
+
+    public HttpLokiTransport(ILokiHttpClient lokiHttpClient, bool orderWrites)
     {
-        private readonly JsonSerializerOptions jsonOptions;
-        private readonly ILokiHttpClient lokiHttpClient;
+        _lokiHttpClient = lokiHttpClient;
 
-        public HttpLokiTransport(ILokiHttpClient lokiHttpClient, bool orderWrites)
-        {
-            this.lokiHttpClient = lokiHttpClient;
+        _jsonOptions = new JsonSerializerOptions();
+        _jsonOptions.Converters.Add(new LokiEventsSerializer(orderWrites));
+        _jsonOptions.Converters.Add(new LokiEventSerializer());
+    }
 
-            jsonOptions = new JsonSerializerOptions();
-            jsonOptions.Converters.Add(new LokiEventsSerializer(orderWrites));
-            jsonOptions.Converters.Add(new LokiEventSerializer());
-        }
+    public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
+    {
+        using var jsonStreamContent = JsonContent.Create(lokiEvents, options: _jsonOptions);
+        using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
+        await ValidateHttpResponse(response);
+    }
 
-        public async Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents)
-        {
-            using var jsonStreamContent = JsonContent.Create(lokiEvents, options: jsonOptions);
-            using var response = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
-            await ValidateHttpResponse(response);
-        }
+    public async Task WriteLogEventsAsync(LokiEvent lokiEvent)
+    {
+        using var jsonStreamContent = JsonContent.Create(lokiEvent, options: _jsonOptions);
+        using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
+        await ValidateHttpResponse(response);
+    }
 
-        public async Task WriteLogEventsAsync(LokiEvent lokiEvent)
-        {
-            using var jsonStreamContent = JsonContent.Create(lokiEvent, options: jsonOptions);
-            using var response = await lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
-            await ValidateHttpResponse(response);
-        }
+    private static async ValueTask ValidateHttpResponse(HttpResponseMessage response)
+    {
+        if(response.IsSuccessStatusCode)
+            return;
 
-        private static async ValueTask ValidateHttpResponse(HttpResponseMessage response)
-        {
-            if(response.IsSuccessStatusCode)
-                return;
+        // Read the response's content
+        var content = response.Content == null ? null :
+            await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            // Read the response's content
-            string content = response.Content == null ? null :
-                await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        InternalLogger.Error("Failed pushing logs to Loki. Code: {Code}. Reason: {Reason}. Message: {Message}.",
+            response.StatusCode, response.ReasonPhrase, content);
 
-            InternalLogger.Error("Failed pushing logs to Loki. Code: {Code}. Reason: {Reason}. Message: {Message}.",
-                response.StatusCode, response.ReasonPhrase, content);
-            
-            #if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
                 throw new HttpRequestException("Failed pushing logs to Loki.", inner: null, response.StatusCode);
-            #else
-                throw new HttpRequestException("Failed pushing logs to Loki.");
-            #endif
-        }
+#else
+        throw new HttpRequestException("Failed pushing logs to Loki.");
+#endif
+    }
+
+    public void Dispose()
+    {
+        _lokiHttpClient.Dispose();
     }
 }
+

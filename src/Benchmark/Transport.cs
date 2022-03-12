@@ -11,31 +11,31 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class Transport
 {
-    private readonly IList<LokiEvent> manyLokiEvents;
-    private readonly IList<LokiEvent> lokiEvents = new List<LokiEvent> {
+    private readonly IList<LokiEvent> _manyLokiEvents;
+    private readonly IList<LokiEvent> _lokiEvents = new List<LokiEvent> {
         new(
             new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".")};
-    private readonly HttpLokiTransport transport = new(new LokiHttpClient(
+    private readonly HttpLokiTransport _transport = new(new LokiHttpClient(
         new HttpClient { BaseAddress = new Uri("http://localhost:3100") }), false);
 
     public Transport()
     {
-        manyLokiEvents = new List<LokiEvent>(100);
+        _manyLokiEvents = new List<LokiEvent>(100);
         for(var i = 0; i < 100; i++)
-            manyLokiEvents.Add(new LokiEvent(lokiEvents[0].Labels, DateTime.Now, lokiEvents[0].Line));
+            _manyLokiEvents.Add(new LokiEvent(_lokiEvents[0].Labels, DateTime.Now, _lokiEvents[0].Line));
     }
 
     [Benchmark]
     public async Task WriteLogEventsAsync()
     {
-        await transport.WriteLogEventsAsync(lokiEvents).ConfigureAwait(false);
+        await _transport.WriteLogEventsAsync(_lokiEvents).ConfigureAwait(false);
     }
 
     [Benchmark]
     public async Task ManyWriteLogEventsAsync()
     {
-        await transport.WriteLogEventsAsync(manyLokiEvents).ConfigureAwait(false);
+        await _transport.WriteLogEventsAsync(_manyLokiEvents).ConfigureAwait(false);
     }
 }

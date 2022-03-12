@@ -1,20 +1,24 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace NLog.Loki
+namespace NLog.Loki;
+
+internal sealed class LokiHttpClient : ILokiHttpClient
 {
-    internal class LokiHttpClient : ILokiHttpClient
+    private readonly HttpClient _httpClient;
+
+    public LokiHttpClient(HttpClient httpClient)
     {
-        private readonly HttpClient httpClient;
+        _httpClient = httpClient;
+    }
 
-        public LokiHttpClient(HttpClient httpClient)
-        {
-            this.httpClient = httpClient;
-        }
+    public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent httpContent)
+    {
+        return _httpClient.PostAsync(requestUri, httpContent);
+    }
 
-        public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent httpContent)
-        {
-            return httpClient.PostAsync(requestUri, httpContent);
-        }
+    public void Dispose()
+    {
+        _httpClient.Dispose();
     }
 }

@@ -8,4 +8,8 @@ internal class NullLokiTransport : ILokiTransport
 {
     public Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents) => Task.CompletedTask;
     public Task WriteLogEventsAsync(LokiEvent lokiEvent) => Task.CompletedTask;
+    public void Dispose()
+    {
+        // Nothing to dispose in this null implementation.
+    }
 }
