@@ -38,10 +38,11 @@ public class HttpLokiTransportTests
         string serializedJsonMessage = null;
         var httpClient = new Mock<ILokiHttpClient>();
         _ = httpClient.Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
-            .Returns<string, HttpContent>(async (s, json) =>
+            .Returns<string, HttpContent>(async (s, content) =>
             {
                 // Intercept the json content so that we can verify it.
-                serializedJsonMessage = await json.ReadAsStringAsync().ConfigureAwait(false);
+                serializedJsonMessage = await content.ReadAsStringAsync().ConfigureAwait(false);
+                Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             });
 
@@ -65,10 +66,11 @@ public class HttpLokiTransportTests
         string serializedJsonMessage = null;
         var httpClient = new Mock<ILokiHttpClient>();
         _ = httpClient.Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
-            .Returns<string, HttpContent>(async (s, json) =>
+            .Returns<string, HttpContent>(async (s, content) =>
             {
                 // Intercept the json content so that we can verify it.
-                serializedJsonMessage = await json.ReadAsStringAsync().ConfigureAwait(false);
+                serializedJsonMessage = await content.ReadAsStringAsync().ConfigureAwait(false);
+                Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             });
 
@@ -92,10 +94,11 @@ public class HttpLokiTransportTests
         string serializedJsonMessage = null;
         var httpClient = new Mock<ILokiHttpClient>();
         _ = httpClient.Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
-                .Returns<string, HttpContent>(async (s, json) =>
+                .Returns<string, HttpContent>(async (s, content) =>
                 {
                     // Intercept the json content so that we can verify it.
-                    serializedJsonMessage = await json.ReadAsStringAsync().ConfigureAwait(false);
+                    serializedJsonMessage = await content.ReadAsStringAsync().ConfigureAwait(false);
+                    Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 });
 
@@ -146,7 +149,6 @@ public class HttpLokiTransportTests
     }
 
     [Test]
-    [TestCase(CompressionLevel.NoCompression)]
     [TestCase(CompressionLevel.Fastest)]
     [TestCase(CompressionLevel.Optimal)]
 #if NET6_0_OR_GREATER
@@ -165,11 +167,15 @@ public class HttpLokiTransportTests
             {
                 // Intercept the gzipped json content so that we can verify it.
                 var stream = await content.ReadAsStreamAsync();
-                if(level != CompressionLevel.NoCompression)
-                    stream = new GZipStream(stream, CompressionMode.Decompress);
+                Assert.True(content.Headers.ContentEncoding.Any(s => s == "gzip"));
+                stream = new GZipStream(stream, CompressionMode.Decompress);
                 var buffer = new byte[128000];
                 var length = stream.Read(buffer, 0, buffer.Length);
                 serializedJsonMessage = Encoding.UTF8.GetString(buffer, 0, length);
+
+                Assert.True(content.Headers.ContentEncoding.Any(s => s == "gzip"));
+                Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
+
                 return new HttpResponseMessage(HttpStatusCode.OK);
             });
 
