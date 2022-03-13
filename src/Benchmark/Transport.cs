@@ -25,8 +25,6 @@ public class Transport
             new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".")};
-    private HttpLokiTransport _transport = new(new LokiHttpClient(
-        new HttpClient { BaseAddress = new Uri("http://localhost:3100") }), false, CompressionLevel.NoCompression);
 
     public Transport()
     {
@@ -35,6 +33,7 @@ public class Transport
             _manyLokiEvents.Add(new LokiEvent(_lokiEvents[0].Labels, DateTime.Now, _lokiEvents[0].Line));
     }
 
+    private HttpLokiTransport _transport;
     [GlobalSetup]
     public void GlobalSetup()
     {
