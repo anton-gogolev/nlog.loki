@@ -34,14 +34,14 @@ internal sealed class HttpLokiTransport : ILokiTransport
     {
         using var jsonStreamContent = CreateContent(lokiEvents);
         using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
-        await ValidateHttpResponse(response);
+        await ValidateHttpResponse(response).ConfigureAwait(false);
     }
 
     public async Task WriteLogEventsAsync(LokiEvent lokiEvent)
     {
         using var jsonStreamContent = CreateContent(lokiEvent);
         using var response = await _lokiHttpClient.PostAsync("loki/api/v1/push", jsonStreamContent).ConfigureAwait(false);
-        await ValidateHttpResponse(response);
+        await ValidateHttpResponse(response).ConfigureAwait(false);
     }
 
     /// <summary>

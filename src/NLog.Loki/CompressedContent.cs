@@ -39,7 +39,7 @@ internal sealed class CompressedContent : HttpContent
     protected async override Task SerializeToStreamAsync(Stream stream, TransportContext context)
     {
         using var gzipStream = new GZipStream(stream, _level, leaveOpen: true);
-        await _originalContent.CopyToAsync(gzipStream);
+        await _originalContent.CopyToAsync(gzipStream).ConfigureAwait(false);
     }
 
     private bool _isDisposed;

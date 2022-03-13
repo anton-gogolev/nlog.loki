@@ -166,7 +166,7 @@ public class HttpLokiTransportTests
             .Returns<string, HttpContent>(async (s, content) =>
             {
                 // Intercept the gzipped json content so that we can verify it.
-                var stream = await content.ReadAsStreamAsync();
+                var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
                 Assert.True(content.Headers.ContentEncoding.Any(s => s == "gzip"));
                 stream = new GZipStream(stream, CompressionMode.Decompress);
                 var buffer = new byte[128000];
