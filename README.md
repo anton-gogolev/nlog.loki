@@ -67,7 +67,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 
 `compressionLevel` - Gzip compression level applied if any when when sending messages to Loki (default `noCompression`). Possible values:
 
-- `noCompression`: no compression applied, HTTP header will not specify any Encoding-Type.
+- `noCompression`: no compression applied, HTTP header will not specify a Content-Encoding with gzip value.
 - `fastest`: the compression operation should complete as quickly as possible, even if the resulting file is not optimally compressed.
 - `optimal`: the compression operation should be optimally compressed, even if the operation takes a longer time to complete.
 - `smallestSize`: supported by .NET 6 or greater only. The compression operation should create output as small as possible, even if the operation takes a longer time to complete.
