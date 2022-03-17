@@ -65,7 +65,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 
 `orderWrites` - Orders the logs by timestamp before sending them to loki when logs are batched in a single HTTP call. This is required if you use Loki v2.3 or below. But it is not required if you use Loki v2.4 or above (see [out-of-order writes](https://grafana.com/docs/loki/next/configuration/#accept-out-of-order-writes)). You are strongly advised to set this value to `false` when using Loki v2.4+ since it reduces allocations by about 20% by the serializer (default `true`).
 
-`compressionLevel` - Gzip compression level applied if any when when sending messages to Loki (default `noCompression`). Possible values:
+`compressionLevel` - Gzip compression level applied if any when sending messages to Loki (default `noCompression`). Possible values:
 
 - `noCompression`: no compression applied, HTTP header will not specify a Content-Encoding with gzip value.
 - `fastest`: the compression operation should complete as quickly as possible, even if the resulting file is not optimally compressed.
