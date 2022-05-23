@@ -54,12 +54,6 @@ namespace NLog.Loki
             InitializeTarget();
         }
 
-        protected override void Write(IList<AsyncLogEventInfo> logEvents)
-        {
-            var events = GetLokiEvents(logEvents.Select(alei => alei.LogEvent));
-            _lazyLokiTransport.Value.WriteLogEventsAsync(events).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
         protected override Task WriteAsyncTask(LogEventInfo logEvent, CancellationToken cancellationToken)
         {
             var @event = GetLokiEvent(logEvent);
