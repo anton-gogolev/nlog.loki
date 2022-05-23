@@ -3,6 +3,9 @@ changelog:
     - title: Breaking Changes
       labels:
         - breaking-change
+    - title: Fixes
+      labels:
+        - bug
     - title: New Features
       labels:
         - feature
