@@ -11,6 +11,7 @@ services:
       - ./loki-config.yml/:/etc/loki/local-config.yaml
     ports:
       - 3100:3100
+      - 9095:9095
     command: -config.file=/etc/loki/local-config.yaml
 
   grafana:
