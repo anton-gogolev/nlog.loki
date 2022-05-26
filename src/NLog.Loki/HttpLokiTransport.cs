@@ -52,6 +52,10 @@ internal sealed class HttpLokiTransport : ILokiTransport
     {
         var jsonContent = JsonContent.Create(lokiEvent, options: _jsonOptions);
 
+        // Some old loki versions support only 'application/json',
+        // not 'application/json; charset=utf-8' content-Type header
+        jsonContent.Headers.ContentType.CharSet = string.Empty;
+
         // If no compression required
         if(_gzipLevel == CompressionLevel.NoCompression)
             return jsonContent;
