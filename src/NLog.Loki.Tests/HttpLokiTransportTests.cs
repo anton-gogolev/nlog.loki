@@ -94,13 +94,13 @@ public class HttpLokiTransportTests
         string serializedJsonMessage = null;
         var httpClient = new Mock<ILokiHttpClient>();
         _ = httpClient.Setup(c => c.PostAsync("loki/api/v1/push", It.IsAny<HttpContent>()))
-                .Returns<string, HttpContent>(async (s, content) =>
-                {
-                    // Intercept the json content so that we can verify it.
-                    serializedJsonMessage = await content.ReadAsStringAsync().ConfigureAwait(false);
-                    Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
-                    return new HttpResponseMessage(HttpStatusCode.OK);
-                });
+            .Returns<string, HttpContent>(async (s, content) =>
+            {
+                // Intercept the json content so that we can verify it.
+                serializedJsonMessage = await content.ReadAsStringAsync().ConfigureAwait(false);
+                Assert.AreEqual("application/json", content.Headers.ContentType.MediaType);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            });
 
         // Send the logging request
         var transport = new HttpLokiTransport(httpClient.Object, false, CompressionLevel.NoCompression);
@@ -108,8 +108,8 @@ public class HttpLokiTransportTests
 
         // Verify the json message format
         Assert.AreEqual(
-                    "{\"streams\":[{\"stream\":{\"env\":\"unittest\",\"job\":\"Job1\"},\"values\":[[\"1640598505100000000\",\"Info|Event from another stream.\"]]}]}",
-                    serializedJsonMessage);
+            "{\"streams\":[{\"stream\":{\"env\":\"unittest\",\"job\":\"Job1\"},\"values\":[[\"1640598505100000000\",\"Info|Event from another stream.\"]]}]}",
+            serializedJsonMessage);
     }
 
     [Test]
@@ -166,11 +166,11 @@ public class HttpLokiTransportTests
             .Returns<string, HttpContent>(async (s, content) =>
             {
                 // Intercept the gzipped json content so that we can verify it.
-                var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+                using var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
                 Assert.True(content.Headers.ContentEncoding.Any(s => s == "gzip"));
-                stream = new GZipStream(stream, CompressionMode.Decompress);
+                using var stream2 = new GZipStream(stream, CompressionMode.Decompress);
                 var buffer = new byte[128000];
-                var length = stream.Read(buffer, 0, buffer.Length);
+                var length = await stream2.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                 serializedJsonMessage = Encoding.UTF8.GetString(buffer, 0, length);
 
                 Assert.True(content.Headers.ContentEncoding.Any(s => s == "gzip"));
@@ -180,7 +180,7 @@ public class HttpLokiTransportTests
             });
 
         // Send the logging request
-        var transport = new HttpLokiTransport(httpClient.Object, orderWrites: false, level);
+        using var transport = new HttpLokiTransport(httpClient.Object, orderWrites: false, level);
         await transport.WriteLogEventsAsync(events).ConfigureAwait(false);
 
         // Verify the json message format
