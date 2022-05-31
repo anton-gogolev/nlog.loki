@@ -14,7 +14,7 @@ public class Transport
 {
     [Params(CompressionLevel.NoCompression, CompressionLevel.Fastest, CompressionLevel.Optimal,
 #if NET6_0_OR_GREATER
-                CompressionLevel.SmallestSize
+        CompressionLevel.SmallestSize
 #endif
         )]
     public CompressionLevel CompressionLevel { get; set; }

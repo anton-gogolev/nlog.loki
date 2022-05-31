@@ -36,10 +36,10 @@ internal sealed class CompressedContent : HttpContent
         return false;
     }
 
-    protected async override Task SerializeToStreamAsync(Stream stream, TransportContext context)
+    protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
     {
         using var gzipStream = new GZipStream(stream, _level, leaveOpen: true);
-        await _originalContent.CopyToAsync(gzipStream).ConfigureAwait(false);
+        return _originalContent.CopyToAsync(gzipStream);
     }
 
     private bool _isDisposed;
