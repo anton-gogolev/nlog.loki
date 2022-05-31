@@ -90,3 +90,7 @@ Under .NET Core, [remember to register](https://github.com/nlog/nlog/wiki/Regist
 `queueLimit` - Gets or sets the limit on the number of requests in the lazy writer thread request queue (default 10000).
 
 `overflowAction` - Gets or sets the action to be taken when the lazy writer thread request queue count exceeds the set limit (default Discard).
+
+### Benchmark
+
+See [NLog.Loki.Benchmarks](https://github.com/corentinaltepe/nlog.loki.benchmark) for benchmark between HTTP and gRPC clients for NLog targets for Loki.
