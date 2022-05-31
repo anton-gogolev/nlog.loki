@@ -5,7 +5,7 @@ using NLog.Loki.Model;
 
 namespace NLog.Loki;
 
-public interface ILokiTransport : IDisposable
+internal interface ILokiTransport : IDisposable
 {
     Task WriteLogEventsAsync(IEnumerable<LokiEvent> lokiEvents);
     Task WriteLogEventsAsync(LokiEvent lokiEvent);

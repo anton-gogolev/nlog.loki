@@ -16,11 +16,11 @@ namespace NLog.Loki;
 /// </remarks>
 internal class LokiEventsSerializer : JsonConverter<IEnumerable<LokiEvent>>
 {
-    private readonly bool orderWrites;
+    private readonly bool _orderWrites;
 
     public LokiEventsSerializer(bool orderWrites)
     {
-        this.orderWrites = orderWrites;
+        this._orderWrites = orderWrites;
     }
 
     public override IEnumerable<LokiEvent> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -51,7 +51,7 @@ internal class LokiEventsSerializer : JsonConverter<IEnumerable<LokiEvent>>
 
             // Order logs by timestamp only if the option is opted-in, because it costs
             // approximately 20% more allocation when serializing 100 events.
-            IEnumerable<LokiEvent> orderedStream = orderWrites ? stream.OrderBy(le => le.Timestamp) : stream;
+            IEnumerable<LokiEvent> orderedStream = _orderWrites ? stream.OrderBy(le => le.Timestamp) : stream;
             foreach(var @event in orderedStream)
             {
                 writer.WriteStartArray();
