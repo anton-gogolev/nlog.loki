@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -75,8 +74,16 @@ public class LokiTarget : AsyncTaskTarget
 
     private LokiEvent GetLokiEvent(LogEventInfo logEvent)
     {
-        var labels = new LokiLabels(Labels.Select(lbl => new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent))));
+        var labels = new LokiLabels(RenderAndMapLokiLabels(Labels, logEvent));
         return new LokiEvent(labels, logEvent.TimeStamp, RenderLogEvent(Layout, logEvent));
+    }
+
+    private static IEnumerable<LokiLabel> RenderAndMapLokiLabels(
+        IList<LokiTargetLabel> lokiTargetLabel,
+        LogEventInfo logEvent)
+    {
+        foreach(var lbl in lokiTargetLabel)
+            yield return new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent));
     }
 
     internal ILokiTransport GetLokiTransport(
