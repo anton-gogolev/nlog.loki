@@ -15,6 +15,7 @@ public class Program
             BenchmarkConverter.TypeToBenchmarks(typeof(Benchmarks), config),
             BenchmarkConverter.TypeToBenchmarks(typeof(Transport), config),
             BenchmarkConverter.TypeToBenchmarks(typeof(LokiEventsSerializer), config),
+            BenchmarkConverter.TypeToBenchmarks(typeof(LokiTargetBenchmark), config),
         });
     }
 }

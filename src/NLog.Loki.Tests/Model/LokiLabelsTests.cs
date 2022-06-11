@@ -18,36 +18,36 @@ internal class LokiLabelsTests
     {
         yield return
             new TestCaseData(
-                new LokiLabels(),
-                new LokiLabels()).
+                new LokiLabels(new HashSet<LokiLabel>()),
+                new LokiLabels(new HashSet<LokiLabel>())).
                 Returns(true);
 
         yield return
             new TestCaseData(
-                new LokiLabels(new LokiLabel("env", "dev")),
-                new LokiLabels()).
+                new LokiLabels(new HashSet<LokiLabel> { new LokiLabel("env", "dev") }),
+                new LokiLabels(new HashSet<LokiLabel>())).
                 Returns(false);
 
         yield return
             new TestCaseData(
-                new LokiLabels(new LokiLabel("env", "dev")),
-                new LokiLabels(new LokiLabel("env", "dev"))).
+                new LokiLabels(new HashSet<LokiLabel> { new LokiLabel("env", "dev") }),
+                new LokiLabels(new HashSet<LokiLabel> { new LokiLabel("env", "dev") })).
                 Returns(true);
 
         yield return
             new TestCaseData(
-                    new LokiLabels(
-                        new LokiLabel("env", "dev"), new LokiLabel("level", "fatal")),
-                    new LokiLabels(
-                        new LokiLabel("level", "fatal"), new LokiLabel("env", "dev"))).
+                    new LokiLabels(new HashSet<LokiLabel> {
+                        new LokiLabel("env", "dev"), new LokiLabel("level", "fatal") }),
+                    new LokiLabels(new HashSet<LokiLabel> {
+                        new LokiLabel("level", "fatal"), new LokiLabel("env", "dev") })).
                 Returns(true);
 
         yield return
             new TestCaseData(
-                    new LokiLabels(
-                        new LokiLabel("env", "dev"), new LokiLabel("level", "fatal")),
-                    new LokiLabels(
-                        new LokiLabel("level", "fatal"), new LokiLabel("env", "dev"), new LokiLabel("severity", "debug"))).
+                    new LokiLabels(new HashSet<LokiLabel> {
+                        new LokiLabel("env", "dev"), new LokiLabel("level", "fatal") }),
+                    new LokiLabels(new HashSet<LokiLabel> {
+                        new LokiLabel("level", "fatal"), new LokiLabel("env", "dev"), new LokiLabel("severity", "debug") })).
                 Returns(false);
     }
 }

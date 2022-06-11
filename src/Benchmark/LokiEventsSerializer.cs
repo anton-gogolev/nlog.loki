@@ -10,51 +10,60 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class LokiEventsSerializer
 {
-    private readonly MemoryStream stream = new();
-    private readonly JsonSerializerOptions serializerOptionsWithoutOrdering = new();
-    private readonly JsonSerializerOptions serializerOptionsWithOrdering = new();
+    private readonly MemoryStream _stream = new();
+    private readonly JsonSerializerOptions _serializerOptionsWithoutOrdering = new();
+    private readonly JsonSerializerOptions _serializerOptionsWithOrdering = new();
 
-    private readonly LokiEvent @event;
-    private readonly IEnumerable<LokiEvent> manyLokiEvents;
+    private readonly LokiEvent _event;
+    private IEnumerable<LokiEvent> _manyLokiEvents;
 
     public LokiEventsSerializer()
     {
-        @event = new LokiEvent(
-            new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
+        _event = new LokiEvent(
+            new LokiLabels(new HashSet<LokiLabel> { new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync") }),
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".");
-        var events = new List<LokiEvent>(100);
-        for(var i = 0; i < 100; i++)
-            events.Add(new LokiEvent(@event.Labels, DateTime.Now, @event.Line));
-        manyLokiEvents = events;
 
-        serializerOptionsWithoutOrdering = new JsonSerializerOptions();
-        serializerOptionsWithoutOrdering.Converters.Add(new NLog.Loki.LokiEventsSerializer(orderWrites: false));
-        serializerOptionsWithoutOrdering.Converters.Add(new NLog.Loki.LokiEventSerializer());
 
-        serializerOptionsWithOrdering = new JsonSerializerOptions();
-        serializerOptionsWithOrdering.Converters.Add(new NLog.Loki.LokiEventsSerializer(orderWrites: true));
-        serializerOptionsWithOrdering.Converters.Add(new NLog.Loki.LokiEventSerializer());
+        _serializerOptionsWithoutOrdering = new JsonSerializerOptions();
+        _serializerOptionsWithoutOrdering.Converters.Add(new NLog.Loki.LokiEventsSerializer(orderWrites: false));
+        _serializerOptionsWithoutOrdering.Converters.Add(new NLog.Loki.LokiEventSerializer());
+
+        _serializerOptionsWithOrdering = new JsonSerializerOptions();
+        _serializerOptionsWithOrdering.Converters.Add(new NLog.Loki.LokiEventsSerializer(orderWrites: true));
+        _serializerOptionsWithOrdering.Converters.Add(new NLog.Loki.LokiEventSerializer());
     }
+
+    [GlobalSetup]
+    public void GlobalSetup()
+    {
+        var events = new List<LokiEvent>(N);
+        for(var i = 0; i < N; i++)
+            events.Add(new LokiEvent(_event.Labels, DateTime.Now, _event.Line));
+        _manyLokiEvents = events;
+    }
+
+    [Params(/*1, 10,*/ 100, 1000)]
+    public int N { get; set; }
 
     [Benchmark]
     public void SerializeManyEventsWithoutOrdering()
     {
-        stream.Position = 0;
-        JsonSerializer.Serialize(stream, manyLokiEvents, serializerOptionsWithoutOrdering);
+        _stream.Position = 0;
+        JsonSerializer.Serialize(_stream, _manyLokiEvents, _serializerOptionsWithoutOrdering);
     }
 
     [Benchmark]
     public void SerializeManyEventsWithOrdering()
     {
-        stream.Position = 0;
-        JsonSerializer.Serialize(stream, manyLokiEvents, serializerOptionsWithOrdering);
+        _stream.Position = 0;
+        JsonSerializer.Serialize(_stream, _manyLokiEvents, _serializerOptionsWithOrdering);
     }
 
     [Benchmark]
     public void SerializeSingleEvent()
     {
-        stream.Position = 0;
-        JsonSerializer.Serialize(stream, @event, serializerOptionsWithoutOrdering);
+        _stream.Position = 0;
+        JsonSerializer.Serialize(_stream, _event, _serializerOptionsWithoutOrdering);
     }
 }
