@@ -13,14 +13,11 @@ namespace Benchmark;
 [MemoryDiagnoser]
 public class LokiTargetBenchmark
 {
-    private readonly LokiTarget _target = new();
-
     private readonly IList<LokiTargetLabel> _labels = new List<LokiTargetLabel> {
         new() { Name = "Label1", Layout = "MyLabel1Value" },
-        new() { Name = "Label2", Layout = "MyLabel2Value" },
+        new() { Name = "Label2", Layout = "MyLabel2Value-${level}" },
         new() { Name = "Label3", Layout = "MyLabel3Value" },
     };
-
     private List<LogEventInfo> _logs;
 
     [GlobalSetup]
@@ -29,7 +26,16 @@ public class LokiTargetBenchmark
         // Generate up to N messages for logevent infos
         _logs = new(N);
         for(var i = 0; i < N; i++)
-            _logs.Add(new LogEventInfo(LogLevel.Info, "MyLogger", RandomString(55)));
+        {
+            var level = (i % 4) switch
+            {
+                0 => LogLevel.Debug,
+                1 => LogLevel.Info,
+                2 => LogLevel.Warn,
+                _ => LogLevel.Error
+            };
+            _logs.Add(new LogEventInfo(level, "MyLogger", RandomString(55)));
+        }
     }
 
     private static readonly Random Random = new();
@@ -51,6 +57,14 @@ public class LokiTargetBenchmark
         _ = await jsonStreamContent.ReadAsByteArrayAsync();
     }
 
+    [Benchmark]
+    public async Task WriteAsyncTaskList_Optimized()
+    {
+        var lokiEvents = GetLokiEventsWithoutLinq(_logs);
+        using var jsonStreamContent = JsonContent.Create(lokiEvents);
+        _ = await jsonStreamContent.ReadAsByteArrayAsync();
+    }
+
     private IEnumerable<LokiEvent> GetLokiEvents(IEnumerable<LogEventInfo> logEvents)
     {
         foreach(var e in logEvents)
@@ -61,6 +75,26 @@ public class LokiTargetBenchmark
     {
         var labels = new LokiLabels(_labels.Select(lbl => new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent))));
         return new LokiEvent(labels, logEvent.TimeStamp, logEvent.ToString());
+    }
+
+    private IEnumerable<LokiEvent> GetLokiEventsWithoutLinq(IEnumerable<LogEventInfo> logEvents)
+    {
+        foreach(var e in logEvents)
+            yield return GetLokiEventWithoutLinq(e);
+    }
+
+    private LokiEvent GetLokiEventWithoutLinq(LogEventInfo logEvent)
+    {
+        var labels = new LokiLabels(RenderAndMapLokiLabels(_labels, logEvent));
+        return new LokiEvent(labels, logEvent.TimeStamp, logEvent.ToString());
+    }
+
+    private static IEnumerable<LokiLabel> RenderAndMapLokiLabels(
+        IList<LokiTargetLabel> lokiTargetLabel,
+        LogEventInfo logEvent)
+    {
+        foreach(var lbl in lokiTargetLabel)
+            yield return new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent));
     }
 }
 

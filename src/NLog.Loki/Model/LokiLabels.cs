@@ -10,8 +10,6 @@ internal class LokiLabels : IEquatable<LokiLabels>
 
     public ISet<LokiLabel> Labels { get; }
 
-    public LokiLabels(params LokiLabel[] labels) : this((IEnumerable<LokiLabel>)labels) { }
-
     public LokiLabels(IEnumerable<LokiLabel> labels)
     {
         Labels = new HashSet<LokiLabel>(labels ?? Enumerable.Empty<LokiLabel>());

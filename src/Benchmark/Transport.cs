@@ -22,7 +22,7 @@ public class Transport
     private readonly IList<LokiEvent> _manyLokiEvents;
     private readonly IList<LokiEvent> _lokiEvents = new List<LokiEvent> {
         new(
-            new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
+            new LokiLabels(new List<LokiLabel> { new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync") }),
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".")};
 

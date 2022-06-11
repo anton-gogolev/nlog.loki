@@ -20,7 +20,7 @@ public class LokiEventsSerializer
     public LokiEventsSerializer()
     {
         @event = new LokiEvent(
-            new LokiLabels(new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync")),
+            new LokiLabels(new List<LokiLabel> { new LokiLabel("env", "benchmark"), new LokiLabel("job", "WriteLogEventsAsync") }),
             DateTime.Now,
             "Info|Receive message from \"A\" with destination \"B\".");
         var events = new List<LokiEvent>(100);
