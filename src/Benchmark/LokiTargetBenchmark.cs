@@ -90,11 +90,11 @@ public class LokiTargetBenchmark
     }
 
     private static IEnumerable<LokiLabel> RenderAndMapLokiLabels(
-        IList<LokiTargetLabel> lokiTargetLabel,
+        IList<LokiTargetLabel> lokiTargetLabels,
         LogEventInfo logEvent)
     {
-        foreach(var lbl in lokiTargetLabel)
-            yield return new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent));
+        foreach(var lokiTargetLabel in lokiTargetLabels)
+            yield return new LokiLabel(lokiTargetLabel.Name, lokiTargetLabel.Layout.Render(logEvent));
     }
 }
 
