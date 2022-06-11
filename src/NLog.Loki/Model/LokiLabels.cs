@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NLog.Loki.Model;
 
@@ -10,13 +9,15 @@ internal class LokiLabels : IEquatable<LokiLabels>
 
     public ISet<LokiLabel> Labels { get; }
 
-    public LokiLabels(IEnumerable<LokiLabel> labels)
+    public LokiLabels(ISet<LokiLabel> labels)
     {
-        Labels = new HashSet<LokiLabel>(labels ?? Enumerable.Empty<LokiLabel>());
-
+        Labels = labels;
         unchecked
         {
-            _hashCode = Labels.Aggregate(0, (current, label) => (current * 397) ^ label.GetHashCode());
+            var hash = 0;
+            foreach(var label in labels)
+                hash = (hash * 397) ^ label.GetHashCode();
+            _hashCode = hash;
         }
     }
 

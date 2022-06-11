@@ -78,12 +78,14 @@ public class LokiTarget : AsyncTaskTarget
         return new LokiEvent(labels, logEvent.TimeStamp, RenderLogEvent(Layout, logEvent));
     }
 
-    private static IEnumerable<LokiLabel> RenderAndMapLokiLabels(
-        IList<LokiTargetLabel> lokiTargetLabel,
+    private static ISet<LokiLabel> RenderAndMapLokiLabels(
+        IList<LokiTargetLabel> lokiTargetLabels,
         LogEventInfo logEvent)
     {
-        foreach(var lbl in lokiTargetLabel)
-            yield return new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent));
+        var set = new HashSet<LokiLabel>();
+        for(var i = 0; i < lokiTargetLabels.Count; i++)
+            _ = set.Add(new LokiLabel(lokiTargetLabels[i].Name, lokiTargetLabels[i].Layout.Render(logEvent)));
+        return set;
     }
 
     internal ILokiTransport GetLokiTransport(

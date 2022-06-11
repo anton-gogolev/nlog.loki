@@ -46,16 +46,8 @@ public class LokiTargetBenchmark
             .Select(s => s[Random.Next(s.Length)]).ToArray());
     }
 
-    [Params(1, 10, 100, 1000)]
+    [Params(/*1, 10,*/ 100, 1000)]
     public int N { get; set; }
-
-    [Benchmark]
-    public async Task WriteAsyncTaskList_Old()
-    {
-        var lokiEvents = GetLokiEvents(_logs);
-        using var jsonStreamContent = JsonContent.Create(lokiEvents);
-        _ = await jsonStreamContent.ReadAsByteArrayAsync();
-    }
 
     [Benchmark]
     public async Task WriteAsyncTaskList_Optimized()
@@ -63,18 +55,6 @@ public class LokiTargetBenchmark
         var lokiEvents = GetLokiEventsWithoutLinq(_logs);
         using var jsonStreamContent = JsonContent.Create(lokiEvents);
         _ = await jsonStreamContent.ReadAsByteArrayAsync();
-    }
-
-    private IEnumerable<LokiEvent> GetLokiEvents(IEnumerable<LogEventInfo> logEvents)
-    {
-        foreach(var e in logEvents)
-            yield return GetLokiEvent(e);
-    }
-
-    private LokiEvent GetLokiEvent(LogEventInfo logEvent)
-    {
-        var labels = new LokiLabels(_labels.Select(lbl => new LokiLabel(lbl.Name, lbl.Layout.Render(logEvent))));
-        return new LokiEvent(labels, logEvent.TimeStamp, logEvent.ToString());
     }
 
     private IEnumerable<LokiEvent> GetLokiEventsWithoutLinq(IEnumerable<LogEventInfo> logEvents)
@@ -89,12 +69,14 @@ public class LokiTargetBenchmark
         return new LokiEvent(labels, logEvent.TimeStamp, logEvent.ToString());
     }
 
-    private static IEnumerable<LokiLabel> RenderAndMapLokiLabels(
+    private static ISet<LokiLabel> RenderAndMapLokiLabels(
         IList<LokiTargetLabel> lokiTargetLabels,
         LogEventInfo logEvent)
     {
-        foreach(var lokiTargetLabel in lokiTargetLabels)
-            yield return new LokiLabel(lokiTargetLabel.Name, lokiTargetLabel.Layout.Render(logEvent));
+        var set = new HashSet<LokiLabel>();
+        for(var i = 0; i < lokiTargetLabels.Count; i++)
+            _ = set.Add(new LokiLabel(lokiTargetLabels[i].Name, lokiTargetLabels[i].Layout.Render(logEvent)));
+        return set;
     }
 }
 
