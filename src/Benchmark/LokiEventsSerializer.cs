@@ -53,17 +53,17 @@ public class LokiEventsSerializer
         JsonSerializer.Serialize(_stream, _manyLokiEvents, _serializerOptionsWithoutOrdering);
     }
 
-    //[Benchmark]
-    //public void SerializeManyEventsWithOrdering()
-    //{
-    //    _stream.Position = 0;
-    //    JsonSerializer.Serialize(_stream, _manyLokiEvents, _serializerOptionsWithOrdering);
-    //}
+    [Benchmark]
+    public void SerializeManyEventsWithOrdering()
+    {
+        _stream.Position = 0;
+        JsonSerializer.Serialize(_stream, _manyLokiEvents, _serializerOptionsWithOrdering);
+    }
 
-    //[Benchmark]
-    //public void SerializeSingleEvent()
-    //{
-    //    _stream.Position = 0;
-    //    JsonSerializer.Serialize(_stream, _event, _serializerOptionsWithoutOrdering);
-    //}
+    [Benchmark]
+    public void SerializeSingleEvent()
+    {
+        _stream.Position = 0;
+        JsonSerializer.Serialize(_stream, _event, _serializerOptionsWithoutOrdering);
+    }
 }
