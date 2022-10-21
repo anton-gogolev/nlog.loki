@@ -4,6 +4,9 @@
     <TargetFrameworks>net6.0;netcoreapp3.1;net480</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
     <IsPackable>false</IsPackable>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../common/sgKey.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
